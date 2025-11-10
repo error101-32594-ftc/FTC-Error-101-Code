@@ -43,6 +43,7 @@ public class TeleOpMecanum extends LinearOpMode {
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = gamepad1.left_stick_x;
             double rx = gamepad1.right_stick_x;
+            double brake = 1.0-gamepad1.right_trigger;
 
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference.
@@ -68,10 +69,17 @@ public class TeleOpMecanum extends LinearOpMode {
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
-            frontLeftMotor.setPower(frontLeftPower);
-            backLeftMotor.setPower(backLeftPower);
-            frontRightMotor.setPower(frontRightPower);
-            backRightMotor.setPower(backRightPower);
+            /* THE FOLLOWING IS PSEUDOCODE
+            if b is pressed on the gamepad {
+                while yaw/90 is not an int {
+                    turn to nearest 90 degrees
+                }
+            }
+            */
+            frontLeftMotor.setPower(frontLeftPower*brake);
+            backLeftMotor.setPower(backLeftPower*brake);
+            frontRightMotor.setPower(frontRightPower*brake);
+            backRightMotor.setPower(backRightPower*brake);
         }
     }
 }
