@@ -18,7 +18,11 @@ public class TeleOpMecanum extends LinearOpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+        DcMotor bigHooperMotor = hardwareMap.dcMotor.get("bigHooperMotor");
+        DcMotor smallHooperMotor = hardwareMap.dcMotor.get("smallHooperMotor");
 
+        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead.
@@ -43,7 +47,7 @@ public class TeleOpMecanum extends LinearOpMode {
             double rx = gamepad1.right_stick_x;
 
             // This button choice was made so that it is hard to hit on accident,
-            // it can be freely changed based on preferenc
+            // it can be freely changed based on preference
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
@@ -53,6 +57,22 @@ public class TeleOpMecanum extends LinearOpMode {
             double backLeftPower = (y - x + rx) / denominator;
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
+
+            telemetry.addData("right stick x",rx);
+            telemetry.addData("x",x);
+            telemetry.addData("y",y);
+            telemetry.update();
+
+            if (gamepad1.a) {
+                smallHooperMotor.setPower(-0.9);
+            }
+            else{
+                bigHooperMotor.setPower(-1);
+                smallHooperMotor.setPower(0);
+            }
+            if (gamepad1.b) {
+                bigHooperMotor.setPower(0);
+            }
 
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
