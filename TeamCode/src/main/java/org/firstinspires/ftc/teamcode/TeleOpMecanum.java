@@ -1,15 +1,20 @@
 package org.firstinspires.ftc.teamcode;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
+
+import java.io.IOException;
 
 @TeleOp
 public class TeleOpMecanum extends LinearOpMode {
+    private IMU.Parameters parameters;
     @Override
     public void runOpMode() throws InterruptedException {
         // Declare our motors
@@ -21,6 +26,8 @@ public class TeleOpMecanum extends LinearOpMode {
         DcMotor bigHooperMotor = hardwareMap.dcMotor.get("bigHooperMotor");
         DcMotor smallHooperMotor = hardwareMap.dcMotor.get("smallHooperMotor");
 
+        VoltageSensor voltageSensor = hardwareMap.voltageSensor.iterator().next();
+
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         // Reverse the right side motors. This may be wrong for your setup.
@@ -31,11 +38,16 @@ public class TeleOpMecanum extends LinearOpMode {
         // Retrieve the IMU from the hardware map
         IMU imu = hardwareMap.get(IMU.class, "imu");
         // Adjust the orientation parameters to match your robot
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+        this.parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
+
+        DiagnosticLogger logger = getLogger();
+        Thread loggerRuntimeThread = new Thread(logger);
+        logger.resumeRun();
+        loggerRuntimeThread.start();
 
         waitForStart();
 
@@ -45,6 +57,8 @@ public class TeleOpMecanum extends LinearOpMode {
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = gamepad1.left_stick_x*1.1;
             double rx = gamepad1.right_stick_x;
+            double brakePower = 1-gamepad1.right_trigger;
+            double bigHooperPower = gamepad1.left_trigger;
 
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference
@@ -58,26 +72,65 @@ public class TeleOpMecanum extends LinearOpMode {
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
 
-            telemetry.addData("right stick x",rx);
-            telemetry.addData("x",x);
-            telemetry.addData("y",y);
+            telemetry.addData("Right Stick X", rx);
+            telemetry.addData("Left Stick X", x);
+            telemetry.addData("Left Stick Y", y);
+            telemetry.addData("Right Trigger", gamepad1.right_trigger);
+            telemetry.addData("Left Trigger", gamepad1.left_trigger);
+            telemetry.addData("frontLeftMotor", frontLeftMotor.getPower());
+            telemetry.addData("frontRightMotor", frontRightMotor.getPower());
+            telemetry.addData("backLeftMotor", backLeftMotor.getPower());
+            telemetry.addData("backRightMotor", backRightMotor.getPower());
+            telemetry.addData("Voltage", voltageSensor.getVoltage());
+            telemetry.addData("A", gamepad1.a);
+            telemetry.addData("B", gamepad1.b);
+            telemetry.addData("X", gamepad1.x);
+            telemetry.addData("Y", gamepad1.y);
+
             telemetry.update();
+
+            if (gamepad1.a && gamepad1.b && gamepad1.x && gamepad1.y)
+            {
+                logger.stopRun();
+            }
 
             if (gamepad1.a) {
                 smallHooperMotor.setPower(-0.9);
-            }
-            else{
-                bigHooperMotor.setPower(-1);
+                bigHooperMotor.setPower(bigHooperPower);
+            } else {
                 smallHooperMotor.setPower(0);
+                bigHooperMotor.setPower(0);
             }
+
             if (gamepad1.b) {
                 bigHooperMotor.setPower(0);
             }
 
-            frontLeftMotor.setPower(frontLeftPower);
-            backLeftMotor.setPower(backLeftPower);
-            frontRightMotor.setPower(frontRightPower);
-            backRightMotor.setPower(backRightPower);
+            frontLeftMotor.setPower(frontLeftPower*brakePower);
+            backLeftMotor.setPower(backLeftPower*brakePower);
+            frontRightMotor.setPower(frontRightPower*brakePower);
+            backRightMotor.setPower(backRightPower*brakePower);
         }
+    }
+
+    @NonNull
+    private DiagnosticLogger getLogger() {
+        DiagnosticLogger logger;
+        try
+        {
+            logger = new DiagnosticLogger(
+                    telemetry, hardwareMap,
+                    new String[] {
+                            "frontLeftMotor", "backLeftMotor",
+                            "frontRightMotor", "backRightMotor",
+                            "bigHooperMotor", "smallHooperMotor"
+                    },
+                    null, null, "imu", parameters
+            );
+        } catch (IOException e) {
+            telemetry.addData("IOException", e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return logger;
     }
 }
