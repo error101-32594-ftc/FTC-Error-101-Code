@@ -30,6 +30,7 @@ public class TeleOpMecanum extends LinearOpMode {
 
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead.
@@ -58,7 +59,7 @@ public class TeleOpMecanum extends LinearOpMode {
             double x = gamepad1.left_stick_x*1.1;
             double rx = gamepad1.right_stick_x;
             double brakePower = 1-gamepad1.right_trigger;
-            double bigHooperPower = gamepad1.left_trigger;
+            double bigHooperPower = -gamepad1.left_trigger;
 
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference
@@ -86,7 +87,6 @@ public class TeleOpMecanum extends LinearOpMode {
             telemetry.addData("B", gamepad1.b);
             telemetry.addData("X", gamepad1.x);
             telemetry.addData("Y", gamepad1.y);
-
             telemetry.update();
 
             if (gamepad1.a && gamepad1.b && gamepad1.x && gamepad1.y)
@@ -95,7 +95,7 @@ public class TeleOpMecanum extends LinearOpMode {
             }
 
             if (gamepad1.a) {
-                smallHooperMotor.setPower(-0.9);
+                smallHooperMotor.setPower(0.9);
                 bigHooperMotor.setPower(bigHooperPower);
             } else {
                 smallHooperMotor.setPower(0);
