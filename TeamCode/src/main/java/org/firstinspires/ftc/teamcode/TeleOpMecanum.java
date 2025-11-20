@@ -101,15 +101,23 @@ public class TeleOpMecanum extends LinearOpMode {
                 logger.stopRun();
             }
 
-            if (gamepad1.a) {
+            if (gamepad1.start)
+            {
+                imu.resetYaw();
+            }
+
+            if (gamepad1.a)
+            {
                 smallHooperMotor.setPower(0.9);
                 bigHooperMotor.setPower(bigHooperPower);
-            } else {
+            } else
+            {
                 smallHooperMotor.setPower(0);
                 bigHooperMotor.setPower(0);
             }
 
-            if (gamepad1.b) {
+            if (gamepad1.b)
+            {
                 bigHooperMotor.setPower(0);
             }
 
@@ -121,20 +129,23 @@ public class TeleOpMecanum extends LinearOpMode {
     }
 
     @NonNull
-    private DiagnosticLogger getLogger() {
+    private DiagnosticLogger getLogger()
+    {
         DiagnosticLogger logger;
         try
         {
             logger = new DiagnosticLogger(
                     telemetry, hardwareMap,
-                    new String[] {
-                            "frontLeftMotor", "backLeftMotor",
-                            "frontRightMotor", "backRightMotor",
-                            "bigHooperMotor", "smallHooperMotor"
+                    new String[]
+                    {
+                        "frontLeftMotor", "backLeftMotor",
+                        "frontRightMotor", "backRightMotor",
+                        "bigHooperMotor", "smallHooperMotor"
                     },
                     null, null, "imu", parameters
             );
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             telemetry.addData("IOException", e.getMessage());
             throw new RuntimeException(e);
         }
