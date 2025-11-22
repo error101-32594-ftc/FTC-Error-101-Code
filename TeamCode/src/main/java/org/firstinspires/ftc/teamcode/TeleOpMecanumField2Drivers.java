@@ -2,22 +2,24 @@ package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 import java.io.IOException;
 
-@TeleOp
-public class TeleOpMecanum extends LinearOpMode {
+@TeleOp(name = "Mecanum - 2 Drivers", group = "Field Centric")
+public class TeleOpMecanumField2Drivers extends LinearOpMode {
     private IMU.Parameters parameters;
     @Override
     public void runOpMode() throws InterruptedException {
-        // Declare our motors
+        // Declare motors
         // Make sure your ID's match your configuration
         DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
@@ -30,19 +32,13 @@ public class TeleOpMecanum extends LinearOpMode {
 
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-
-        // Reverse the right side motors. This may be wrong for your setup.
-        // If your robot moves backwards when commanded to go forwards,
-        // reverse the left side instead.
-        // See the note about this earlier on this page.
-
         // Retrieve the IMU from the hardware map
         IMU imu = hardwareMap.get(IMU.class, "imu");
-        // Adjust the orientation parameters to match your robot
+        // The private parameters variable is passed to the logger at the bottom of this class.
         this.parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP));
-        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
+        // Without this, the REV Hub's orientation is assumed to be logo UP / USB FORWARD
         imu.initialize(parameters);
 
         DiagnosticLogger logger = getLogger();
@@ -68,8 +64,6 @@ public class TeleOpMecanum extends LinearOpMode {
             double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
 
             rotX = rotX * 1.1;
-            // This button choice was made so that it is hard to hit on accident,
-            // it can be freely changed based on preference
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
@@ -90,10 +84,10 @@ public class TeleOpMecanum extends LinearOpMode {
             telemetry.addData("backLeftMotor", backLeftMotor.getPower());
             telemetry.addData("backRightMotor", backRightMotor.getPower());
             telemetry.addData("Voltage", voltageSensor.getVoltage());
-            telemetry.addData("A", gamepad1.a);
-            telemetry.addData("B", gamepad1.b);
-            telemetry.addData("X", gamepad1.x);
-            telemetry.addData("Y", gamepad1.y);
+            telemetry.addData("1A, 2A", new boolean[]{gamepad1.a, gamepad2.a});
+            telemetry.addData("1B, 2B", new boolean[]{gamepad1.b, gamepad2.b});
+            telemetry.addData("1X, 2X", new boolean[]{gamepad1.x, gamepad2.x});
+            telemetry.addData("1Y, 2X", new boolean[]{gamepad1.y, gamepad2.y});
             telemetry.update();
 
             if (gamepad1.a && gamepad1.b && gamepad1.x && gamepad1.y)
@@ -106,7 +100,7 @@ public class TeleOpMecanum extends LinearOpMode {
                 imu.resetYaw();
             }
 
-            if (gamepad1.a)
+            if (gamepad2.a)
             {
                 smallHooperMotor.setPower(0.9);
                 bigHooperMotor.setPower(bigHooperPower);
@@ -116,7 +110,7 @@ public class TeleOpMecanum extends LinearOpMode {
                 bigHooperMotor.setPower(0);
             }
 
-            if (gamepad1.b)
+            if (gamepad2.b)
             {
                 bigHooperMotor.setPower(0);
             }

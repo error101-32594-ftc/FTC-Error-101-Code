@@ -2,16 +2,19 @@ package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+
 import java.io.IOException;
 
-@TeleOp
-public class RobotCentricMecanum extends LinearOpMode {
+@TeleOp(name = "Mecanum - 1 Driver", group = "Robot Centric")
+public class TeleOpMecanumRobot1Driver extends LinearOpMode {
+    private IMU.Parameters parameters;
     @Override
     public void runOpMode() throws InterruptedException {
         // Declare our motors
@@ -27,13 +30,14 @@ public class RobotCentricMecanum extends LinearOpMode {
 
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-
-        // Reverse the right side motors. This may be wrong for your setup.
-        // If your robot moves backwards when commanded to go forwards,
-        // reverse the left side instead.
-        // See the note about this earlier on this page.
-
         // Retrieve the IMU from the hardware map
+        IMU imu = hardwareMap.get(IMU.class, "imu");
+        // The private parameters variable is passed to the logger at the bottom of this class.
+        this.parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP));
+        // Without this, the REV Hub's orientation is assumed to be logo UP / USB FORWARD
+        imu.initialize(parameters);
 
         DiagnosticLogger logger = getLogger();
         Thread loggerRuntimeThread = new Thread(logger);
@@ -46,15 +50,15 @@ public class RobotCentricMecanum extends LinearOpMode {
 
         while (opModeIsActive()) {
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-            double x = gamepad1.left_stick_x*1.1;
+            double x = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x;
-            double brakePower = 1-gamepad1.right_trigger;
+            double brakePower = 1 - gamepad1.right_trigger;
             double bigHooperPower = -gamepad1.left_trigger;
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
             // but only if at least one is out of the range [-1, 1]
-            double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
             double frontLeftPower = (y + x + rx) / denominator;
             double backLeftPower = (y - x + rx) / denominator;
             double frontRightPower = (y - x - rx) / denominator;
@@ -80,7 +84,6 @@ public class RobotCentricMecanum extends LinearOpMode {
             {
                 logger.stopRun();
             }
-            }
 
             if (gamepad1.a)
             {
@@ -97,10 +100,10 @@ public class RobotCentricMecanum extends LinearOpMode {
                 bigHooperMotor.setPower(0);
             }
 
-            frontLeftMotor.setPower(frontLeftPower*brakePower);
-            backLeftMotor.setPower(backLeftPower*brakePower);
-            frontRightMotor.setPower(frontRightPower*brakePower);
-            backRightMotor.setPower(backRightPower*brakePower);
+            frontLeftMotor.setPower(frontLeftPower * brakePower);
+            backLeftMotor.setPower(backLeftPower * brakePower);
+            frontRightMotor.setPower(frontRightPower * brakePower);
+            backRightMotor.setPower(backRightPower * brakePower);
         }
     }
 
@@ -126,5 +129,5 @@ public class RobotCentricMecanum extends LinearOpMode {
             throw new RuntimeException(e);
         }
         return logger;
-    }
+}
 }
