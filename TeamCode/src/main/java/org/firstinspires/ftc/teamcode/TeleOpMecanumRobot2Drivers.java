@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import java.io.IOException;
 
-@TeleOp(name = "Mecanum - 1 Driver", group = "Robot Centric")
+@TeleOp(name = "Mecanum - 2 Drivers", group = "Robot Centric")
 public class TeleOpMecanumRobot2Drivers extends LinearOpMode {
     private IMU.Parameters parameters;
     @Override
