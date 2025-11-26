@@ -52,6 +52,8 @@ public class DiagnosticLogger implements Runnable
 
         this.voltageSensor = providedHardwareMap.voltageSensor.iterator().next();
 
+        
+        // Building the header string:
         if(providedDcMotorNames != null)
         {
             this.dcMotors = new DcMotor[providedDcMotorNames.length];
@@ -103,15 +105,15 @@ public class DiagnosticLogger implements Runnable
             header.append("imu_yaw,imu_pitch,imu_roll");
             imu.initialize(providedImuParams);
         } else { this.imu = null; }
+        
 
         String csvHeader = header.toString();
-
         this.bufferedCsvWriter = new BufferedCsvWriter(filename, csvHeader);
     }
 
     public String getCurrentDate()
     {
-        return new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(new Date());
+        return new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.ENGLISH).format(new Date());
     }
 
     private static class BufferedCsvWriter
@@ -205,7 +207,6 @@ public class DiagnosticLogger implements Runnable
                 try
                 {
                     bufferedCsvWriter.write(buildCsvLine());
-                    // I'll add the actual data here when the whole class is deemed safe.
                     Thread.sleep(100);
                 } catch(IOException e)
                 {
