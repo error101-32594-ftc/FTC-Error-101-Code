@@ -3,31 +3,38 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Autonomous
 public class AutoBasic extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        // Declare motors based on config:
-        DcMotor frontMotor = hardwareMap.dcMotor.get("frontMotor");
-        DcMotor bigHooperMotor = hardwareMap.dcMotor.get("bigHooperMotor");
-        DcMotor backMotor = hardwareMap.dcMotor.get("backMotor");
-        DcMotor smallHooperMotor = hardwareMap.dcMotor.get("smallHooperMotor");
+        // Declare motors
+        // Make sure your ID's match your configuration
+        DcMotorEx frontLeftMotor = hardwareMap.get(DcMotorEx.class, "frontLeftMotor");
+        DcMotorEx backLeftMotor = hardwareMap.get(DcMotorEx.class, "backLeftMotor");
+        DcMotorEx frontRightMotor = hardwareMap.get(DcMotorEx.class, "frontRightMotor");
+        DcMotorEx backRightMotor = hardwareMap.get(DcMotorEx.class, "backRightMotor");
+        DcMotorEx bigHooperMotor = hardwareMap.get(DcMotorEx.class, "bigHooperMotor");
+        DcMotorEx smallHooperMotor = hardwareMap.get(DcMotorEx.class, "smallHooperMotor");
 
-        frontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
 
         if(isStopRequested()) return;
 
         while(opModeIsActive()) {
-            frontMotor.setPower(1);
-            backMotor.setPower(1);
+            frontLeftMotor.setPower(1);
+            frontRightMotor.setPower(1);
+            backLeftMotor.setPower(1);
+            backRightMotor.setPower(1);
             sleep(2000);
-            frontMotor.setPower(0);
-            backMotor.setPower(0);
+            frontLeftMotor.setPower(1);
+            frontRightMotor.setPower(1);
+            backLeftMotor.setPower(1);
+            backRightMotor.setPower(1);
         }
     }
 };
