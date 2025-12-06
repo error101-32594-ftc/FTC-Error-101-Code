@@ -25,16 +25,14 @@ public class AutoBasic extends LinearOpMode {
 
         if(isStopRequested()) return;
 
-        while(opModeIsActive()) {
-            frontLeftMotor.setPower(1);
-            frontRightMotor.setPower(1);
-            backLeftMotor.setPower(1);
-            backRightMotor.setPower(1);
-            sleep(2000);
-            frontLeftMotor.setPower(1);
-            frontRightMotor.setPower(1);
-            backLeftMotor.setPower(1);
-            backRightMotor.setPower(1);
-        }
+        frontLeftMotor.setPower(0.5);
+        frontRightMotor.setPower(0.5);
+        backLeftMotor.setPower(0.5);
+        backRightMotor.setPower(0.5);
+        sleep(2000);
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(0);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(0);
     }
 };
