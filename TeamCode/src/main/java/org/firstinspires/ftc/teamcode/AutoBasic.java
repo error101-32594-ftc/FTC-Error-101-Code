@@ -29,10 +29,19 @@ public class AutoBasic extends LinearOpMode {
         frontRightMotor.setPower(0.5);
         backLeftMotor.setPower(0.5);
         backRightMotor.setPower(0.5);
-        sleep(2000);
+        sleep(2200);
+        frontLeftMotor.setPower(0.25);
+        frontRightMotor.setPower(0.25);
+        backLeftMotor.setPower(-0.25);
+        backRightMotor.setPower(-0.25);
+        sleep(750);
         frontLeftMotor.setPower(0);
         frontRightMotor.setPower(0);
         backLeftMotor.setPower(0);
         backRightMotor.setPower(0);
+        bigHooperMotor.setPower(-0.625);
+        sleep(2000);
+        bigHooperMotor.setPower(0);
+
     }
 };
