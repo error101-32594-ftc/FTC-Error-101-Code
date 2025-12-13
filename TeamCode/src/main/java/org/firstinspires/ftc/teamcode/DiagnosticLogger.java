@@ -18,6 +18,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -159,17 +160,17 @@ public class DiagnosticLogger implements Runnable
     public String buildCsvLine()
     {
         StringBuilder row = new StringBuilder();
+        DecimalFormat df = new DecimalFormat("#.####");
         row.append(System.currentTimeMillis() - msSinceEpoch).append(",");
-        row.append(String.format(Locale.ENGLISH, "%.2f",
-                voltageSensor.getVoltage())).append(",");
+        row.append(df.format(voltageSensor.getVoltage())).append(",");
 
         if(dcMotors != null)
         {
             for(DcMotor dcMotor : dcMotors)
             {
                 row.append(dcMotor.getPortNumber()).append(",");
-                row.append(dcMotor.getPower()).append(",");
-                row.append(dcMotor.getCurrentPosition()).append(",");
+                row.append(df.format(dcMotor.getPower())).append(",");
+                row.append(df.format(dcMotor.getCurrentPosition())).append(",");
             }
         }
 
@@ -178,13 +179,21 @@ public class DiagnosticLogger implements Runnable
             for(DcMotorEx dcMotorEx : dcMotorExs)
             {
                 row.append(dcMotorEx.getPortNumber()).append(",");
-                row.append(dcMotorEx.getPower()).append(",");
-                row.append(dcMotorEx.getCurrentPosition()).append(",");
-                row.append(dcMotorEx.getTargetPosition()).append(",");
-                row.append(dcMotorEx.getVelocity()).append(",");
-                row.append(dcMotorEx.getCurrent(
-                        CurrentUnit.MILLIAMPS
-                )).append(",");
+                row.append(
+                        df.format(dcMotorEx.getPower())
+                ).append(",");
+                row.append(
+                        df.format(dcMotorEx.getCurrentPosition())
+                ).append(",");
+                row.append(
+                        df.format(dcMotorEx.getTargetPosition())
+                ).append(",");
+                row.append(
+                        df.format(dcMotorEx.getVelocity())
+                ).append(",");
+                row.append(
+                        df.format(dcMotorEx.getCurrent(CurrentUnit.MILLIAMPS))
+                ).append(",");
             }
         }
 
@@ -192,9 +201,9 @@ public class DiagnosticLogger implements Runnable
         {
             for(CRServo crServo : crServos)
             {
-                row.append(crServo.getPortNumber()).append(",");
-                row.append(crServo.getPower()).append(",");
-                row.append(crServo.getDirection()).append(",");
+                row.append(df.format(crServo.getPortNumber())).append(",");
+                row.append(df.format(crServo.getPower())).append(",");
+                row.append(df.format(crServo.getDirection())).append(",");
             }
         }
 
@@ -202,9 +211,9 @@ public class DiagnosticLogger implements Runnable
         {
             YawPitchRollAngles robotOrientation =
                     imu.getRobotYawPitchRollAngles();
-            row.append(robotOrientation.getYaw()).append(",");
-            row.append(robotOrientation.getPitch()).append(",");
-            row.append(robotOrientation.getRoll()).append(",");
+            row.append(df.format(robotOrientation.getYaw())).append(",");
+            row.append(df.format(robotOrientation.getPitch())).append(",");
+            row.append(df.format(robotOrientation.getRoll())).append(",");
         }
         return row.toString();
     }
