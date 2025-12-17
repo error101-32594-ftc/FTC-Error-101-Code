@@ -44,21 +44,23 @@ public class DiagnosticLogger implements Runnable
             IMU.Parameters providedImuParams
             ) throws IOException {
 
-        String filename = String.format("/sdcard/FIRST/DiagnosticLogs/%s.csv", getCurrentDate());
+        String filename = String.format("/sdcard/FIRST/DiagnosticLogs/%s.csv",
+                getCurrentDate());
         StringBuilder header = new StringBuilder();
         header.append("timestamp,voltage,");
 
         this.telemetry = providedTelemetry;
 
-        this.voltageSensor = providedHardwareMap.voltageSensor.iterator().next();
-
+        this.voltageSensor = providedHardwareMap.voltageSensor
+                .iterator().next();
         
         // Building the header string:
         if(providedDcMotorNames != null)
         {
             this.dcMotors = new DcMotor[providedDcMotorNames.length];
             for(int i = 0; i < providedDcMotorNames.length; i++) {
-                this.dcMotors[i] = providedHardwareMap.get(DcMotor.class, providedDcMotorNames[i]);
+                this.dcMotors[i] = providedHardwareMap.get(DcMotor.class,
+                        providedDcMotorNames[i]);
             }
             for(String dcMotorName : providedDcMotorNames)
             {
@@ -72,7 +74,8 @@ public class DiagnosticLogger implements Runnable
         {
             this.dcMotorExs = new DcMotorEx[providedDcMotorExNames.length];
             for(int i = 0; i < providedDcMotorExNames.length; i++) {
-                this.dcMotorExs[i] = providedHardwareMap.get(DcMotorEx.class, providedDcMotorExNames[i]);
+                this.dcMotorExs[i] = providedHardwareMap.get(DcMotorEx.class,
+                        providedDcMotorExNames[i]);
             }
             for(String dcMotorExName : providedDcMotorExNames)
             {
@@ -89,7 +92,8 @@ public class DiagnosticLogger implements Runnable
         {
             this.crServos = new CRServo[providedCRServoNames.length];
             for(int i = 0; i < providedCRServoNames.length; i++) {
-                this.crServos[i] = providedHardwareMap.get(CRServo.class, providedCRServoNames[i]);
+                this.crServos[i] = providedHardwareMap.get(CRServo.class,
+                        providedCRServoNames[i]);
             }
             for(String crServoName : providedCRServoNames)
             {
@@ -113,7 +117,8 @@ public class DiagnosticLogger implements Runnable
 
     public String getCurrentDate()
     {
-        return new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.ENGLISH).format(new Date());
+        return new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.ENGLISH)
+                .format(new Date());
     }
 
     private static class BufferedCsvWriter
@@ -121,7 +126,9 @@ public class DiagnosticLogger implements Runnable
         final FileWriter fileWriter;
         private final BufferedWriter bufferedWriter;
 
-        public BufferedCsvWriter(String filename, String header) throws IOException
+        public BufferedCsvWriter(
+                String filename, String header
+                ) throws IOException
         {
             File tmp = new File(filename);
             if(!tmp.exists())
@@ -153,7 +160,8 @@ public class DiagnosticLogger implements Runnable
     {
         StringBuilder row = new StringBuilder();
         row.append(System.currentTimeMillis() - msSinceEpoch).append(",");
-        row.append(String.format(Locale.ENGLISH, "%.2f", voltageSensor.getVoltage())).append(",");
+        row.append(String.format(Locale.ENGLISH, "%.2f",
+                voltageSensor.getVoltage())).append(",");
 
         if(dcMotors != null)
         {
@@ -174,7 +182,9 @@ public class DiagnosticLogger implements Runnable
                 row.append(dcMotorEx.getCurrentPosition()).append(",");
                 row.append(dcMotorEx.getTargetPosition()).append(",");
                 row.append(dcMotorEx.getVelocity()).append(",");
-                row.append(dcMotorEx.getCurrent(CurrentUnit.MILLIAMPS)).append(",");
+                row.append(dcMotorEx.getCurrent(
+                        CurrentUnit.MILLIAMPS
+                )).append(",");
             }
         }
 
@@ -190,7 +200,8 @@ public class DiagnosticLogger implements Runnable
 
         if(imu != null)
         {
-            YawPitchRollAngles robotOrientation = imu.getRobotYawPitchRollAngles();
+            YawPitchRollAngles robotOrientation =
+                    imu.getRobotYawPitchRollAngles();
             row.append(robotOrientation.getYaw()).append(",");
             row.append(robotOrientation.getPitch()).append(",");
             row.append(robotOrientation.getRoll()).append(",");
