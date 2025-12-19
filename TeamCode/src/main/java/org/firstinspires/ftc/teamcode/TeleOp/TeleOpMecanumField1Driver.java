@@ -1,23 +1,24 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
 import androidx.annotation.NonNull;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.DiagnosticLogger;
 
 import java.io.IOException;
 
 @TeleOp(group = "Field Centric")
-public class TeleOpMecanumField2Drivers extends LinearOpMode {
+public class TeleOpMecanumField1Driver extends LinearOpMode {
     private IMU.Parameters parameters;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -62,7 +63,7 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode {
             double x = gamepad1.left_stick_x*1.1;
             double rx = gamepad1.right_stick_x;
             double brakePower = 1-gamepad1.right_trigger;
-            double bigHooperPower = -gamepad2.left_trigger;
+            double bigHooperPower = -gamepad1.left_trigger;
 
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -129,6 +130,7 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode {
                 imu.resetYaw();
             }
 
+
             if(gamepad2.y)
             {
                 bigHooperMotor.setPower(0.9);
@@ -137,11 +139,10 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode {
                 bigHooperMotor.setPower(bigHooperPower);
             }
 
-            if (gamepad2.a)
+            if (gamepad1.a)
             {
                 smallHooperMotor.setPower(0.9);
-            }  else if (gamepad2.x)
-            {
+            } else if (gamepad1.x) {
                 smallHooperMotor.setPower(-0.9);
             } else
             {
@@ -180,14 +181,13 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode {
         {
             logger = new DiagnosticLogger(
                     telemetry, hardwareMap,
-                    null,
                     new String[]
                     {
-                            "frontLeftMotor", "backLeftMotor",
-                            "frontRightMotor", "backRightMotor",
-                            "bigHooperMotor", "smallHooperMotor"
+                        "frontLeftMotor", "backLeftMotor",
+                        "frontRightMotor", "backRightMotor",
+                        "bigHooperMotor", "smallHooperMotor"
                     },
-                    null, "imu", parameters
+                    null, null, "imu", parameters
             );
         } catch (IOException e)
         {
