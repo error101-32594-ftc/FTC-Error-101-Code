@@ -70,7 +70,14 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode {
             double rx = gamepad1.right_stick_x;
             double brakePower = 1-gamepad1.right_trigger;
             // Max target RPM: 4200
-            double bigHooperPower = gamepad2.left_trigger * 4200;
+            double bigHooperPower;
+            if(gamepad2.left_trigger > 0)
+            {
+                bigHooperPower = gamepad2.left_trigger * 6000;
+            } else
+            {
+                bigHooperPower = 2500;
+            }
 
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -154,21 +161,6 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode {
             } else
             {
                 smallHooperMotor.setPower(0);
-            }
-
-
-            if (gamepad2.dpad_up)
-            {
-                bigHooperMotor.setVelocity(-(2300.0 /60)*CPR);
-            } else if (gamepad2.dpad_left)
-            {
-                bigHooperMotor.setVelocity(-(2800.0/60)*CPR);
-            } else if (gamepad2.dpad_down)
-            {
-                bigHooperMotor.setVelocity(-(3600.0/60)*CPR);
-            } else if (gamepad2.dpad_right)
-            {
-                bigHooperMotor.setVelocity(-(4600.0/60)*CPR);
             }
 
             frontLeftMotor.setPower(frontLeftPower*brakePower);

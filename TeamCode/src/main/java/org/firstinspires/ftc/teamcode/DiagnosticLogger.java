@@ -112,7 +112,7 @@ public class DiagnosticLogger implements Runnable
         } else { this.imu = null; }
         
 
-        String csvHeader = header.toString();
+        String csvHeader = header.toString().replaceAll(",+$", "");
         this.bufferedCsvWriter = new BufferedCsvWriter(filename, csvHeader);
     }
 

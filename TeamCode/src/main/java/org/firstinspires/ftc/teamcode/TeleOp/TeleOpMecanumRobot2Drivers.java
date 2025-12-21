@@ -21,6 +21,8 @@ public class TeleOpMecanumRobot2Drivers extends LinearOpMode {
     private IMU.Parameters parameters;
     @Override
     public void runOpMode() throws InterruptedException {
+        // CPR of a Rev HD Hex Motor.
+        final int CPR = 28;
         // Declare our motors
         // Make sure your ID's match your configuration
         DcMotorEx frontLeftMotor = hardwareMap.get(DcMotorEx.class, "frontLeftMotor");
@@ -33,6 +35,7 @@ public class TeleOpMecanumRobot2Drivers extends LinearOpMode {
         VoltageSensor voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        bigHooperMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeftMotor.setZeroPowerBehavior(BRAKE);
         frontRightMotor.setZeroPowerBehavior(BRAKE);
@@ -62,7 +65,7 @@ public class TeleOpMecanumRobot2Drivers extends LinearOpMode {
             double x = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x;
             double brakePower = 1 - gamepad1.right_trigger;
-            double bigHooperPower = -gamepad2.left_trigger;
+            double bigHooperPower = gamepad2.left_trigger * 6000;
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
@@ -118,10 +121,10 @@ public class TeleOpMecanumRobot2Drivers extends LinearOpMode {
 
             if(gamepad2.y)
             {
-                bigHooperMotor.setPower(0.9);
+                bigHooperMotor.setPower(-0.9);
             } else
             {
-                bigHooperMotor.setPower(bigHooperPower);
+                bigHooperMotor.setVelocity((bigHooperPower / 60)*CPR);
             }
 
             if (gamepad2.a)
@@ -132,23 +135,6 @@ public class TeleOpMecanumRobot2Drivers extends LinearOpMode {
             } else
             {
                 smallHooperMotor.setPower(0);
-            }
-
-            // RPM presets for the shooting motor:
-            // CPR of a Rev HD Hex Motor.
-            final int CPR = 28;
-            if (gamepad2.dpad_up)
-            {
-                bigHooperMotor.setVelocity(-(2300.0 /60)*CPR);
-            } else if (gamepad2.dpad_left)
-            {
-                bigHooperMotor.setVelocity(-(2800.0/60)*CPR);
-            } else if (gamepad2.dpad_down)
-            {
-                bigHooperMotor.setVelocity(-(3600.0/60)*CPR);
-            } else if (gamepad2.dpad_right)
-            {
-                bigHooperMotor.setVelocity(-(4600.0/60)*CPR);
             }
 
             frontLeftMotor.setPower(frontLeftPower * brakePower);
