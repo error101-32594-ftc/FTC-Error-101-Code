@@ -1,7 +1,7 @@
 // Author: ElectraBytes04
 // Last Modified: 2025-11-16
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;

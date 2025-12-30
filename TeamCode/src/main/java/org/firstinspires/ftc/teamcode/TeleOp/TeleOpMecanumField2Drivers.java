@@ -1,85 +1,114 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
-
 import androidx.annotation.NonNull;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.DiagnosticLogger;
+
+import org.firstinspires.ftc.teamcode.util.Constants;
+import org.firstinspires.ftc.teamcode.util.DiagnosticLogger;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 @TeleOp(group = "Field Centric")
-public class TeleOpMecanumField2Drivers extends LinearOpMode {
-    private IMU.Parameters parameters;
+public class TeleOpMecanumField2Drivers extends LinearOpMode
+{
+    private final static int CPR = Constants.CPR;
+    private static IMU.Parameters parameters;
+
+    private final static FtcDashboard DASH = FtcDashboard.getInstance();
+
+    private final static TelemetryPacket packet = new TelemetryPacket();
 
     @Override
-    public void runOpMode() throws InterruptedException {
-        // CPR of a Rev HD Hex Motor.
-        final int CPR = 28;
+    public void runOpMode()
+    {
+        Telemetry telemetryD = DASH.getTelemetry();
+        Telemetry telemetryM = new MultipleTelemetry(telemetry, DASH.getTelemetry());
 
-        // Declare motors
-        // Make sure your ID's match your configuration
-        DcMotorEx frontLeftMotor = hardwareMap.get(DcMotorEx.class, "frontLeftMotor");
-        DcMotorEx backLeftMotor = hardwareMap.get(DcMotorEx.class, "backLeftMotor");
-        DcMotorEx frontRightMotor = hardwareMap.get(DcMotorEx.class, "frontRightMotor");
-        DcMotorEx backRightMotor = hardwareMap.get(DcMotorEx.class, "backRightMotor");
-        DcMotorEx bigHooperMotor = hardwareMap.get(DcMotorEx.class, "bigHooperMotor");
-        DcMotorEx smallHooperMotor = hardwareMap.get(DcMotorEx.class, "smallHooperMotor");
+        telemetryD.setDisplayFormat(Telemetry.DisplayFormat.HTML);
+        telemetryM.setDisplayFormat(Telemetry.DisplayFormat.HTML);
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
 
-        VoltageSensor voltageSensor = hardwareMap.voltageSensor.iterator().next();
+        // Note to self: only use hardwareMap in or after the initialization!
+        DcMotorEx[] base = Constants.getDriveMotors(hardwareMap);
+        DcMotorEx[] scoring = Constants.getScoringMotors(hardwareMap);
+        IMU imu = Constants.getIMU(hardwareMap);
+        Limelight3A limelight = Constants.getLimelight(hardwareMap);
 
-        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        bigHooperMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        frontLeftMotor.setZeroPowerBehavior(BRAKE);
-        frontRightMotor.setZeroPowerBehavior(BRAKE);
-        backRightMotor.setZeroPowerBehavior(BRAKE);
-        backLeftMotor.setZeroPowerBehavior(BRAKE);
-
-        // Retrieve the IMU from the hardware map
-        IMU imu = hardwareMap.get(IMU.class, "imu");
-        // The private parameters variable is passed to the logger at the bottom of this class.
-        this.parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP));
-        // Without this, the REV Hub's orientation is assumed to be logo UP / USB FORWARD
+        parameters = Constants.getIMUParms();
         imu.initialize(parameters);
+
+        limelight.start();
+
+        boolean lockOn = false;
+
+        telemetryM.addLine("> Ready.");
+        telemetryM.update();
+
+        waitForStart();
+
+        // Ensure telemetry is clear on start.
+        // FtcDashboard tends to keep telemetry in the buffer even after
+        // update()-ing.
+        // (We abuse this a bit later to have nicely formatted text, since
+        // FtcDashboard also likes alphabetizing data.)
+        telemetryM.clear();
 
         DiagnosticLogger logger = getLogger();
         Thread loggerRuntimeThread = new Thread(logger);
         logger.resumeRun();
         loggerRuntimeThread.start();
 
-        waitForStart();
+        boolean pastLeftBumper = false;
 
-        if (isStopRequested()) return;
+        while(opModeIsActive())
+        {
+            LLResult rawResult = limelight.getLatestResult();
+            List<LLResultTypes.FiducialResult> fiducial = rawResult.getFiducialResults();
+            boolean resultIsValid = rawResult.isValid();
 
-        while (opModeIsActive()) {
-            double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
+            boolean leftBumper = gamepad1.left_bumper;
+            double targetX;
+
+            double y = -gamepad1.left_stick_y;
             double x = gamepad1.left_stick_x*1.1;
-            double rx = gamepad1.right_stick_x;
-            double brakePower = 1-gamepad1.right_trigger;
-            // Max target RPM: 4200
-            double bigHooperPower;
-            if(gamepad2.left_trigger > 0)
+            double rx;
+            if(lockOn && resultIsValid)
             {
-                bigHooperPower = gamepad2.left_trigger * 6000;
+                targetX = rawResult.getTx();
+                // A simple proportional input; May use PI (proportional-integral)
+                // control in the future.
+                // getTx returns a value in the range of -27.25 to 27.25.
+                // We want to get a value from -1 to 1, so we can just divide
+                // by 27.25. (27.25/27.25 = 1)
+                rx = targetX/27.25;
             } else
             {
-                bigHooperPower = 2500;
+                rx = gamepad1.right_stick_x;
             }
 
+            double brakePower = 1-gamepad1.right_trigger;
+            // Max target RPM: 4900
+            double bigHooperPower = 2500 + (gamepad2.left_trigger * 2400);
+
+            // --- Trigonometry Warning !!! --- (Continues for 14 lines)
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            double botHeadingDegrees = botHeading * (180.0/Math.PI);
 
             // Rotate the movement direction counter to the bot's rotation
             double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
@@ -96,42 +125,44 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode {
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
-            telemetry.addData("1, LT", gamepad1.left_trigger);
-            telemetry.addData("1, RT", gamepad1.right_trigger);
-            telemetry.addData("1, LB", gamepad1.left_bumper);
-            telemetry.addData("1, LB", gamepad1.right_bumper);
-            telemetry.addData("1, LT", gamepad1.left_trigger);
-            telemetry.addData("1, LS-X", gamepad1.left_stick_x);
-            telemetry.addData("1, LS-Y", gamepad1.left_stick_y);
-            telemetry.addData("1, RS-X", gamepad1.right_stick_x);
-            telemetry.addData("1, RS-Y", gamepad1.right_stick_y);
-            telemetry.addData("1, DU", gamepad1.dpad_up);
-            telemetry.addData("1, DL", gamepad1.dpad_left);
-            telemetry.addData("1, DD", gamepad1.dpad_down);
-            telemetry.addData("1, DR", gamepad1.dpad_right);
-            telemetry.addData("1, A", gamepad1.a);
-            telemetry.addData("1, B", gamepad1.b);
-            telemetry.addData("1, X", gamepad1.x);
-            telemetry.addData("1, Y", gamepad1.y);
+            // -- Runtime Telemetry --
+            double bigHooperSpeed = (scoring[0].getVelocity()*60)/CPR;
+            String runtimeSeconds = String.format(
+                    Locale.ENGLISH, "%.4f", getRuntime()
+            );
 
-            telemetry.addData("2, LT", gamepad2.left_trigger);
-            telemetry.addData("2, RT", gamepad2.right_trigger);
-            telemetry.addData("2, LB", gamepad2.left_bumper);
-            telemetry.addData("2, LB", gamepad2.right_bumper);
-            telemetry.addData("2, LT", gamepad2.left_trigger);
-            telemetry.addData("2, LS-X", gamepad2.left_stick_x);
-            telemetry.addData("2, LS-Y", gamepad2.left_stick_y);
-            telemetry.addData("2, RS-X", gamepad2.right_stick_x);
-            telemetry.addData("2, RS-Y", gamepad2.right_stick_y);
-            telemetry.addData("2, DU", gamepad2.dpad_up);
-            telemetry.addData("2, DL", gamepad2.dpad_left);
-            telemetry.addData("2, DD", gamepad2.dpad_down);
-            telemetry.addData("2, DR", gamepad2.dpad_right);
-            telemetry.addData("2, A", gamepad2.a);
-            telemetry.addData("2, B", gamepad2.b);
-            telemetry.addData("2, X", gamepad2.x);
-            telemetry.addData("2, Y", gamepad2.y);
+            packet.clearLines();
+            packet.put("<span style=display:none;>",
+                    "</span>" +
+                            "Runtime (Seconds): " + runtimeSeconds + "<br>" +
+                            "<br>" +
+                            "== Shooting Motor (scoring[0]) =="
+            );
 
+            // runtimeSeconds shouldn't be graphable,so we make it a line
+            // instead of data. (FtcDashboard graph already adds time as X)
+            DASH.sendTelemetryPacket(packet);
+            telemetryD.addData("shooting-input-rpm", bigHooperPower);
+            telemetryD.addData("shooting-speed-rpm", bigHooperSpeed);
+            telemetryD.update();
+            telemetryD.addData("<br><span style=display:none;>", "</span>");
+            telemetryD.update();
+            telemetryD.addData("right-stick-x", rx);
+            telemetryD.addData("bot-heading", botHeadingDegrees);
+            telemetryD.addData("lock-on", lockOn);
+            telemetryD.addData("valid-target", resultIsValid);
+            telemetryD.update();
+
+            telemetry.addData("Runtime (Seconds)", runtimeSeconds);
+            telemetry.addLine();
+            telemetry.addLine("== Shooting Motor (scoring[0]) ==");
+            telemetry.addData("shooting-input-rpm", bigHooperPower);
+            telemetry.addData("shooting-speed-rpm", bigHooperSpeed);
+            telemetry.addLine();
+            telemetry.addData("right-stick-x", rx);
+            telemetry.addData("bot-heading", botHeadingDegrees);
+            telemetry.addData("lock-on", lockOn);
+            telemetry.addData("valid-target", resultIsValid);
             telemetry.update();
 
             if (gamepad1.a && gamepad1.b && gamepad1.x && gamepad1.y)
@@ -144,29 +175,39 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode {
                 imu.resetYaw();
             }
 
+            // pastLeftBumper initializes to false
+            if(leftBumper && ! pastLeftBumper)
+            {
+                // LockOn toggle
+                lockOn = !lockOn;
+
+            }
+
             if(gamepad2.y)
             {
-                bigHooperMotor.setPower(-0.9);
+                scoring[0].setPower(-0.9);
             } else
             {
-                bigHooperMotor.setVelocity((bigHooperPower / 60)*CPR);
+                scoring[0].setVelocity((bigHooperPower / 60)*CPR);
             }
 
             if (gamepad2.a)
             {
-                smallHooperMotor.setPower(0.9);
+                scoring[1].setPower(0.9);
             }  else if (gamepad2.x)
             {
-                smallHooperMotor.setPower(-0.9);
+                scoring[1].setPower(-0.9);
             } else
             {
-                smallHooperMotor.setPower(0);
+                scoring[1].setPower(0);
             }
 
-            frontLeftMotor.setPower(frontLeftPower*brakePower);
-            backLeftMotor.setPower(backLeftPower*brakePower);
-            frontRightMotor.setPower(frontRightPower*brakePower);
-            backRightMotor.setPower(backRightPower*brakePower);
+            base[0].setPower(frontLeftPower*brakePower);
+            base[1].setPower(backLeftPower*brakePower);
+            base[2].setPower(backRightPower*brakePower);
+            base[3].setPower(frontRightPower*brakePower);
+
+            pastLeftBumper = leftBumper;
         }
     }
 
@@ -189,7 +230,6 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode {
             );
         } catch (IOException e)
         {
-            telemetry.addData("IOException", e.getMessage());
             throw new RuntimeException(e);
         }
         return logger;

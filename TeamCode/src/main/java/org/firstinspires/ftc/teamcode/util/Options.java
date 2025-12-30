@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(group = "management")
+@Autonomous(group = "Management")
 public class Options extends LinearOpMode
 {
     private final String[] prompts = {
@@ -33,9 +33,9 @@ public class Options extends LinearOpMode
         telemetry.addData("LB", modes[4]);
         telemetry.addData("RB", modes[5]);
 
-        for (int i = 0; i > prompts.length; i++)
+        for(String prompt : prompts)
         {
-            continue;
+            System.out.println(prompt);
         }
     }
 }
