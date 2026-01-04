@@ -28,6 +28,7 @@ import java.util.Locale;
 public class TeleOpMecanumField2Drivers extends LinearOpMode
 {
     private final static int CPR = Constants.CPR;
+    private final static double LOCK_ON_DENOMINATOR = Constants.LOCK_ON_DENOMINATOR;
     private static IMU.Parameters parameters;
 
     private final static FtcDashboard DASH = FtcDashboard.getInstance();
@@ -96,7 +97,7 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
                 // getTx returns a value in the range of -27.25 to 27.25.
                 // We want to get a value from -1 to 1, so we can just divide
                 // by 27.25. (27.25/27.25 = 1)
-                rx = targetX/27.25;
+                rx = targetX/LOCK_ON_DENOMINATOR;
             } else
             {
                 rx = gamepad1.right_stick_x;

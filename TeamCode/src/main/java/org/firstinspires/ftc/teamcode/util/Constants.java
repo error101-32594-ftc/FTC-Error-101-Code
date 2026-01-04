@@ -20,6 +20,7 @@ public class Constants
 {
     // Counts-Per-Revolution of a REV HD Hex Motor.
     public static int CPR = 28;
+    public static double LOCK_ON_DENOMINATOR = 27.25;
 
     public static DcMotorEx[] getDriveMotors(HardwareMap hardwareMap)
     {
