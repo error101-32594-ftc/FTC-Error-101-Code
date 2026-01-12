@@ -7,17 +7,14 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp(group = "Testing")
 public class Shooter extends LinearOpMode
 {
-    private final int CPR = Constants.CPR;
+    private final int CPR = TeamConstants.CPR;
 
     private final static FtcDashboard DASH = FtcDashboard.getInstance();
 
@@ -36,9 +33,9 @@ public class Shooter extends LinearOpMode
         );
         telemetryM.setDisplayFormat(Telemetry.DisplayFormat.HTML);
 
-        DcMotorEx[] scoring = Constants.getScoringMotors(hardwareMap);
+        DcMotorEx[] scoring = TeamConstants.getScoringMotors(hardwareMap);
 
-        Limelight3A limelight = Constants.getLimelight(hardwareMap);
+        Limelight3A limelight = TeamConstants.getLimelight(hardwareMap);
 
         limelight.start();
 
