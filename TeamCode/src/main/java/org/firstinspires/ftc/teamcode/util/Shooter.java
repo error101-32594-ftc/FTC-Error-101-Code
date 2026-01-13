@@ -15,6 +15,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Shooter extends LinearOpMode
 {
     private final int CPR = TeamConstants.CPR;
+    private final double LL_MOUNT_ANGLE = TeamConstants.LL_MOUNT_ANGLE;
+    private final double LL_LENS_HEIGHT_INCHES = TeamConstants.LL_LENS_HEIGHT_INCHES;
+    private final double GOAL_HEIGHT_INCHES = TeamConstants.GOAL_HEIGHT_INCHES;
 
     private final static FtcDashboard DASH = FtcDashboard.getInstance();
 
@@ -23,9 +26,6 @@ public class Shooter extends LinearOpMode
     {
         // CONSTANTS:
         int INCREMENT = 25;
-        double LL_MOUNT_ANGLE = 30;
-        double LL_LENS_HEIGHT_INCHES = 14.5;
-        double GOAL_HEIGHT_INCHES = 38.75;
         //
 
         Telemetry telemetryM = new MultipleTelemetry(
@@ -78,13 +78,15 @@ public class Shooter extends LinearOpMode
             if(intake)
             {
                 scoring[1].setPower(0.9);
+                scoring[2].setPower(0.9);
             } else if(intakeReverse)
             {
                 scoring[1].setPower(-0.9);
+                scoring[2].setPower(-0.9);
             } else
             {
                 scoring[1].setPower(0);
-
+                scoring[2].setPower(0);
             }
 
             scoring[0].setVelocity((shootingInputRPM / 60) * CPR);

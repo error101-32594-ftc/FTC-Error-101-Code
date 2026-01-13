@@ -18,6 +18,10 @@ public class TeamConstants
     public static double LOCK_ON_DENOMINATOR = 27.25;
     public static double LOCK_ON_OFFSET = 0.0;
 
+    public static double LL_MOUNT_ANGLE = 30;
+    public static double LL_LENS_HEIGHT_INCHES = 14.5;
+    public static double GOAL_HEIGHT_INCHES = 38.75;
+
     public static DcMotorEx[] getDriveMotors(HardwareMap hardwareMap)
     {
             // --- Get Motor Objects ---

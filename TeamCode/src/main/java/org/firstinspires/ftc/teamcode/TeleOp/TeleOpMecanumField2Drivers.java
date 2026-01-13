@@ -48,6 +48,9 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
         final int CPR = TeamConstants.CPR;
         final double LOCK_ON_DENOMINATOR = TeamConstants.LOCK_ON_DENOMINATOR;
         final double LOCK_ON_OFFSET = TeamConstants.LOCK_ON_OFFSET;
+        final double LL_MOUNT_ANGLE = TeamConstants.LL_MOUNT_ANGLE;
+        final double LL_LENS_HEIGHT_INCHES = TeamConstants.LL_LENS_HEIGHT_INCHES;
+        final double GOAL_HEIGHT_INCHES = TeamConstants.GOAL_HEIGHT_INCHES;
 
         final DcMotorEx[] base = TeamConstants.getDriveMotors(hardwareMap);
         final DcMotorEx[] scoring = TeamConstants.getScoringMotors(hardwareMap);
@@ -76,17 +79,20 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
         loggerRuntimeThread.start();
 
         boolean lockOn = false;
+        boolean autoShot = true;
         boolean pastLeftBumper1 = false;
+        boolean pastB2 = false;
 
         while(opModeIsActive())
         {
             LLResult rawResult = limelight.getLatestResult();
             boolean resultIsValid = rawResult.isValid();
 
-            double rx, targetX;
+            // LockOn logic
+            double rx;
             if(lockOn && resultIsValid)
             {
-                targetX = rawResult.getTx();
+                double targetX = rawResult.getTx();
                 // A simple proportional input; May use PI (proportional-integral)
                 // control in the future.
                 // getTx returns a value in the range of -27.25 to 27.25.
@@ -97,25 +103,55 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
             {
                 rx = gamepad1.right_stick_x;
             }
+
+            // "Artemis Take the Flywheel" logic
+            double hooperPower;
+            if(autoShot)
+            {
+                double targetY = rawResult.getTy();
+                double distance =
+                        (GOAL_HEIGHT_INCHES - LL_LENS_HEIGHT_INCHES) / Math.tan(
+                            ((LL_MOUNT_ANGLE + targetY) * (Math.PI/180.0))
+                        )
+                ;
+
+                if(distance >= 65.7)
+                {
+                    hooperPower = (28.6*distance)+2623;
+                } else if(distance >= 47.5)
+                {
+                    hooperPower = (16.5*distance)+3416;
+                } else if(distance >= 38.8)
+                {
+                    hooperPower = (8.62*distance)+3791;
+                } else
+                {
+                    hooperPower = 3000;
+                }
+            } else
+            {
+                // Max target RPM: 4900
+                hooperPower = 3000 + (gamepad2.left_trigger * 1900);
+            }
             double driveBreakPower = 1-gamepad1.right_trigger;
 
             // Gamepad variables:
             boolean a1 = gamepad1.a;
             boolean a2 = gamepad2.a;
             boolean b1 = gamepad1.b;
+            boolean b2 = gamepad2.b;
             boolean x1 = gamepad1.x;
             boolean x2 = gamepad2.x;
             boolean y1 = gamepad1.y;
             boolean y2 = gamepad2.y;
             boolean leftBumper1 = gamepad1.left_bumper;
             boolean rightBumper2 = gamepad2.right_bumper;
+            double rightTrigger2 = gamepad2.right_trigger;
             boolean start1 = gamepad1.start;
 
             double lsY1 = -gamepad1.left_stick_y;
             double lsX1 = gamepad1.left_stick_x*1.1;
 
-            // Max target RPM: 4900
-            double hooperPower = 3000 + (gamepad2.left_trigger * 1900);
 
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             double botHeadingDegrees = botHeading * (180.0/Math.PI);
@@ -162,6 +198,7 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
             telemetryD.update();
             telemetryD.addData("right-stick-x", rx);
             telemetryD.addData("bot-heading", botHeadingDegrees);
+            telemetryD.addData("auto-shot", autoShot);
             telemetryD.addData("lock-on", lockOn);
             telemetryD.addData("valid-target", resultIsValid);
             telemetryD.update();
@@ -174,6 +211,7 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
             telemetry.addLine();
             telemetry.addData("right-stick-x", rx);
             telemetry.addData("bot-heading", botHeadingDegrees);
+            telemetry.addData("auto-shot", autoShot);
             telemetry.addData("lock-on", lockOn);
             telemetry.addData("valid-target", resultIsValid);
             telemetry.update();
@@ -188,10 +226,9 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
                 imu.resetYaw();
             }
 
-            // pastLeftBumper initializes to false
+            // LockOn toggle
             if(leftBumper1 && ! pastLeftBumper1)
             {
-                // LockOn toggle
                 lockOn = !lockOn;
 
             }
@@ -225,12 +262,19 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
                 scoring[2].setPower(0);
             }
 
+            // "Artemis Take the Flywheel" toggle
+            if(rightTrigger2 == 1 && b2 && ! pastB2)
+            {
+                autoShot = !autoShot;
+            }
+
             base[0].setPower(frontLeftPower*driveBreakPower);
             base[1].setPower(backLeftPower*driveBreakPower);
             base[2].setPower(backRightPower*driveBreakPower);
             base[3].setPower(frontRightPower*driveBreakPower);
 
             pastLeftBumper1 = leftBumper1;
+            pastB2 = b2;
         }
     }
 
