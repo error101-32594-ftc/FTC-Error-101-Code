@@ -8,8 +8,10 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp(group = "Testing")
 public class Shooter extends LinearOpMode
@@ -34,9 +36,13 @@ public class Shooter extends LinearOpMode
         telemetryM.setDisplayFormat(Telemetry.DisplayFormat.HTML);
 
         DcMotorEx[] scoring = TeamConstants.getScoringMotors(hardwareMap);
+        DcMotorEx[] base = TeamConstants.getDriveMotors(hardwareMap);
+        IMU.Parameters parameters = TeamConstants.getIMUParms();
+        IMU imu = TeamConstants.getIMU(hardwareMap);
 
         Limelight3A limelight = TeamConstants.getLimelight(hardwareMap);
 
+        imu.initialize(parameters);
         limelight.start();
 
         telemetryM.addLine("Ready.");
@@ -89,7 +95,38 @@ public class Shooter extends LinearOpMode
                 scoring[2].setPower(0);
             }
 
+            double lsY1 = -gamepad1.left_stick_y;
+            double lsX1 = gamepad1.left_stick_x*1.1;
+            double rx = gamepad1.right_stick_x;
+
+
+            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            double botHeadingDegrees = botHeading * (180.0/Math.PI);
+            // Rotate the movement direction counter to the bot's rotation
+            double rotX = 1.1*(
+                    lsX1 * Math.cos(-botHeading) - lsY1 * Math.sin(-botHeading)
+            );
+            double rotY =
+                    lsX1 * Math.sin(-botHeading) + lsY1 * Math.cos(-botHeading)
+                    ;
+
+            // Denominator is the largest motor power (absolute value) or 1
+            // This ensures all the powers maintain the same ratio,
+            // but only if at least one is out of the range [-1, 1]
+            double denominator = Math.max(
+                    Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1
+            );
+            double frontLeftPower = (rotY + rotX + rx) / denominator;
+            double backLeftPower = (rotY - rotX + rx) / denominator;
+            double backRightPower = (rotY - rotX - rx) / denominator;
+            double frontRightPower = (rotY + rotX - rx) / denominator;
+
+
             scoring[0].setVelocity((shootingInputRPM / 60) * CPR);
+            base[0].setPower(frontLeftPower);
+            base[1].setPower(backLeftPower);
+            base[2].setPower(frontRightPower);
+            base[3].setPower(backRightPower);
 
             telemetryM.addData("shooting-input-rpm", shootingInputRPM);
             telemetryM.addData("shooting-speed-rpm", (scoring[0].getVelocity() * 60) / CPR);

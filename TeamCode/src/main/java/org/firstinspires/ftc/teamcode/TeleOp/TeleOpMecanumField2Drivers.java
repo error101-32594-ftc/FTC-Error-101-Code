@@ -82,6 +82,9 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
         boolean autoShot = true;
         boolean pastLeftBumper1 = false;
         boolean pastB2 = false;
+        int meanCounter = 0;
+        double aggregateDistance = 0;
+        double meanDistance = 0;
 
         while(opModeIsActive())
         {
@@ -105,29 +108,53 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
             }
 
             // "Artemis Take the Flywheel" logic
-            double hooperPower;
+            double hooperPower, rawDistance = 0;
             if(autoShot)
             {
                 double targetY = rawResult.getTy();
-                double distance =
+                rawDistance =
                         (GOAL_HEIGHT_INCHES - LL_LENS_HEIGHT_INCHES) / Math.tan(
                             ((LL_MOUNT_ANGLE + targetY) * (Math.PI/180.0))
                         )
                 ;
 
-                if(distance >= 65.7)
+                //if (meanCounter < 10) {
+                //    aggregateDistance += rawDistance;
+                //    meanCounter++;
+                //}
+                //else
+                //{
+                //    oldMean = aggregateDistance / 10;
+                //
+                //    aggregateDistance -= oldMean;
+                //
+                //    aggregateDistance += rawDistance;
+                //
+                //    meanDistance = aggregateDistance / 10;
+                //}
+
+                //if(meanCounter > 10)
+                //{
+                //    meanDistance = aggregateDistance / 10;
+
+                //    meanCounter = 0;
+                //    aggregateDistance = 0;
+                //}
+
+                if(rawDistance >= 65.7)
                 {
-                    hooperPower = (28.6*distance)+2623;
-                } else if(distance >= 47.5)
+                    hooperPower = (28.6*rawDistance)+2623;
+                } else if(rawDistance >= 47.5)
                 {
-                    hooperPower = (16.5*distance)+3416;
-                } else if(distance >= 38.8)
+                    hooperPower = (16.5*rawDistance)+3416;
+                } else if(rawDistance >= 38.8)
                 {
-                    hooperPower = (8.62*distance)+3791;
+                    hooperPower = (8.62*rawDistance)+3791;
                 } else
                 {
                     hooperPower = 3000;
                 }
+                meanDistance = 0;
             } else
             {
                 // Max target RPM: 4900
@@ -199,6 +226,7 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
             telemetryD.addData("right-stick-x", rx);
             telemetryD.addData("bot-heading", botHeadingDegrees);
             telemetryD.addData("auto-shot", autoShot);
+            telemetryD.addData("ll-distance", rawDistance);
             telemetryD.addData("lock-on", lockOn);
             telemetryD.addData("valid-target", resultIsValid);
             telemetryD.update();
@@ -212,6 +240,7 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
             telemetry.addData("right-stick-x", rx);
             telemetry.addData("bot-heading", botHeadingDegrees);
             telemetry.addData("auto-shot", autoShot);
+            telemetry.addData("ll-distance", rawDistance);
             telemetry.addData("lock-on", lockOn);
             telemetry.addData("valid-target", resultIsValid);
             telemetry.update();
