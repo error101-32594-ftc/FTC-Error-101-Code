@@ -85,6 +85,8 @@ public class Field2Drivers extends LinearOpMode
         int meanCounter = 0;
         double aggregateDistance = 0;
         double meanDistance = 0;
+        double tempDistance = 0;
+        double pastDistance = 0;
 
         while(opModeIsActive())
         {
@@ -112,11 +114,13 @@ public class Field2Drivers extends LinearOpMode
             if(autoShot)
             {
                 double targetY = rawResult.getTy();
-                rawDistance =
+                double distanceCalc =
                         (GOAL_HEIGHT_INCHES - LL_LENS_HEIGHT_INCHES) / Math.tan(
-                            ((LL_MOUNT_ANGLE + targetY) * (Math.PI/180.0))
+                                ((LL_MOUNT_ANGLE + targetY) * (Math.PI/180.0))
                         )
                 ;
+
+                rawDistance = rawResult.isValid() ? distanceCalc : pastDistance;
 
                 //if (meanCounter < 10) {
                 //    aggregateDistance += rawDistance;
@@ -142,17 +146,33 @@ public class Field2Drivers extends LinearOpMode
 
                     meanCounter = 0;
                     aggregateDistance = 0;
+
                 }
 
-                if(rawDistance >= 65.7)
+                tempDistance = rawDistance;
+                pastDistance = tempDistance;
+
+                if(tempDistance >= 81.5)
                 {
-                    hooperPower = (28.6*rawDistance)+2623;
-                } else if(rawDistance >= 47.5)
+                    hooperPower = (6.25*tempDistance)-644;
+                } else if(tempDistance >= 76.2)
                 {
-                    hooperPower = (16.5*rawDistance)+3416;
-                } else if(rawDistance >= 38.8)
+                    hooperPower = (18.9*tempDistance)+2912;
+                } else if(tempDistance >= 65.7)
                 {
-                    hooperPower = (8.62*rawDistance)+3791;
+                    hooperPower = (33.3*tempDistance)+1810;
+                } else if(tempDistance >= 59.1)
+                {
+                    hooperPower = (22.7*tempDistance)+2507;
+                } else if(tempDistance >= 54.6)
+                {
+                    hooperPower = (-22.2*tempDistance)+5163;
+                } else if(tempDistance >= 47.5)
+                {
+                    hooperPower = 3950;
+                } else if(tempDistance >= 40.4)
+                {
+                    hooperPower = (-14.1*tempDistance)+4619;
                 } else
                 {
                     hooperPower = 3000;
