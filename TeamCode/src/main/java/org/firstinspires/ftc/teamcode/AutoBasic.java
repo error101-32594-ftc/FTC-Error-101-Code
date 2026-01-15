@@ -21,32 +21,32 @@ public class AutoBasic extends LinearOpMode {
 
         if(isStopRequested()) return;
 
-        base[0].setPower(-0.5);
-        base[1].setPower(-0.5);
-        base[2].setPower(-0.5);
-        base[3].setPower(-0.5);
-        sleep(1000);
-        /*base[0].setPower(0.5);
+        base[0].setPower(0.5);
         base[1].setPower(0.5);
         base[2].setPower(0.5);
         base[3].setPower(0.5);
+        sleep(2500);
+        /*base[0].setPower(0.5);
+        base[1].setPower(0.5);
+        base[2].setPower(0.5);
+        base[3].setPower(0.5); */
         base[0].setPower(0.25);
         base[1].setPower(0.25);
         base[2].setPower(-0.25);
-        base[3].setPower(-0.25); */
-        //sleep(750);
+        base[3].setPower(-0.25);
+        sleep(750);
         base[0].setPower(0);
-        base[0].setPower(0);
-        base[0].setPower(0);
-        base[0].setPower(0);
+        base[1].setPower(0);
+        base[2].setPower(0);
+        base[3].setPower(0);
         scoring[0].setVelocity(4500);
         sleep(2000);
         scoring[1].setPower(1);
         scoring[2].setPower(1);
-        sleep(600);
+        sleep(6000);
         scoring[1].setPower(0);
         scoring[2].setPower(0);
-        sleep(500);
+        sleep(5000);
         scoring[1].setPower(1);
         scoring[2].setPower(1);
         sleep(800);
