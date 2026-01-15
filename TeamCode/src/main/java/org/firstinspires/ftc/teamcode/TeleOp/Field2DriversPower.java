@@ -5,25 +5,23 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.limelightvision.LLResult;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
-import org.firstinspires.ftc.teamcode.util.TeamConstants;
 import org.firstinspires.ftc.teamcode.util.DiagnosticLogger;
+import org.firstinspires.ftc.teamcode.util.TeamConstants;
 
 import java.io.IOException;
 import java.util.Locale;
 
 @TeleOp(group = "Field Centric")
-public class TeleOpMecanumField2Drivers extends LinearOpMode
+public class Field2DriversPower extends LinearOpMode
 {
     // Required for the DiagnosticLogger at the bottom of this file:
     private final static IMU.Parameters parameters = TeamConstants.getIMUParms();
@@ -48,9 +46,6 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
         final int CPR = TeamConstants.CPR;
         final double LOCK_ON_DENOMINATOR = TeamConstants.LOCK_ON_DENOMINATOR;
         final double LOCK_ON_OFFSET = TeamConstants.LOCK_ON_OFFSET;
-        final double LL_MOUNT_ANGLE = TeamConstants.LL_MOUNT_ANGLE;
-        final double LL_LENS_HEIGHT_INCHES = TeamConstants.LL_LENS_HEIGHT_INCHES;
-        final double GOAL_HEIGHT_INCHES = TeamConstants.GOAL_HEIGHT_INCHES;
 
         final DcMotorEx[] base = TeamConstants.getDriveMotors(hardwareMap);
         final DcMotorEx[] scoring = TeamConstants.getScoringMotors(hardwareMap);
@@ -79,9 +74,7 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
         loggerRuntimeThread.start();
 
         boolean lockOn = false;
-        boolean autoShot = true;
         boolean pastLeftBumper1 = false;
-        boolean pastB2 = false;
 
         while(opModeIsActive())
         {
@@ -104,49 +97,19 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
                 rx = gamepad1.right_stick_x;
             }
 
-            // "Artemis Take the Flywheel" logic
-            double hooperPower;
-            if(autoShot)
-            {
-                double targetY = rawResult.getTy();
-                double distance =
-                        (GOAL_HEIGHT_INCHES - LL_LENS_HEIGHT_INCHES) / Math.tan(
-                            ((LL_MOUNT_ANGLE + targetY) * (Math.PI/180.0))
-                        )
-                ;
-
-                if(distance >= 65.7)
-                {
-                    hooperPower = (28.6*distance)+2623;
-                } else if(distance >= 47.5)
-                {
-                    hooperPower = (16.5*distance)+3416;
-                } else if(distance >= 38.8)
-                {
-                    hooperPower = (8.62*distance)+3791;
-                } else
-                {
-                    hooperPower = 3000;
-                }
-            } else
-            {
-                // Max target RPM: 4900
-                hooperPower = 3000 + (gamepad2.left_trigger * 1900);
-            }
+            double hooperPower = gamepad2.left_trigger;
             double driveBreakPower = 1-gamepad1.right_trigger;
 
             // Gamepad variables:
             boolean a1 = gamepad1.a;
             boolean a2 = gamepad2.a;
             boolean b1 = gamepad1.b;
-            boolean b2 = gamepad2.b;
             boolean x1 = gamepad1.x;
             boolean x2 = gamepad2.x;
             boolean y1 = gamepad1.y;
             boolean y2 = gamepad2.y;
             boolean leftBumper1 = gamepad1.left_bumper;
             boolean rightBumper2 = gamepad2.right_bumper;
-            double rightTrigger2 = gamepad2.right_trigger;
             boolean start1 = gamepad1.start;
 
             double lsY1 = -gamepad1.left_stick_y;
@@ -198,7 +161,6 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
             telemetryD.update();
             telemetryD.addData("right-stick-x", rx);
             telemetryD.addData("bot-heading", botHeadingDegrees);
-            telemetryD.addData("auto-shot", autoShot);
             telemetryD.addData("lock-on", lockOn);
             telemetryD.addData("valid-target", resultIsValid);
             telemetryD.update();
@@ -211,7 +173,6 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
             telemetry.addLine();
             telemetry.addData("right-stick-x", rx);
             telemetry.addData("bot-heading", botHeadingDegrees);
-            telemetry.addData("auto-shot", autoShot);
             telemetry.addData("lock-on", lockOn);
             telemetry.addData("valid-target", resultIsValid);
             telemetry.update();
@@ -238,7 +199,7 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
                 scoring[0].setPower(-0.9);
             } else
             {
-                scoring[0].setVelocity((hooperPower / 60)*CPR);
+                scoring[0].setPower(hooperPower);
             }
 
             if (rightBumper2 && a2)
@@ -262,19 +223,12 @@ public class TeleOpMecanumField2Drivers extends LinearOpMode
                 scoring[2].setPower(0);
             }
 
-            // "Artemis Take the Flywheel" toggle
-            if(rightTrigger2 == 1 && b2 && ! pastB2)
-            {
-                autoShot = !autoShot;
-            }
-
             base[0].setPower(frontLeftPower*driveBreakPower);
             base[1].setPower(backLeftPower*driveBreakPower);
             base[2].setPower(backRightPower*driveBreakPower);
             base[3].setPower(frontRightPower*driveBreakPower);
 
             pastLeftBumper1 = leftBumper1;
-            pastB2 = b2;
         }
     }
 
