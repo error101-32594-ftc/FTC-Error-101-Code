@@ -16,13 +16,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Config
 public class Constants {
-    public static double multiplierForward = 0.08294676287147268;
+    public static double multiplierForward = 0.008294676287147268;
     public static double multiplierStrafe = 0.008038662919454933;
     public static double multiplierTurn = 0.02731472448271;
 
 
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(8.9);
+            .mass(20.4);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
