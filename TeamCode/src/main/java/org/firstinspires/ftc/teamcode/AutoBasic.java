@@ -2,9 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.teamcode.util.TeamConstants;
 
 @Autonomous
 public class AutoBasic extends LinearOpMode {
@@ -12,36 +12,46 @@ public class AutoBasic extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         // Declare motors
         // Make sure your ID's match your configuration
-        DcMotorEx frontLeftMotor = hardwareMap.get(DcMotorEx.class, "frontLeftMotor");
-        DcMotorEx backLeftMotor = hardwareMap.get(DcMotorEx.class, "backLeftMotor");
-        DcMotorEx frontRightMotor = hardwareMap.get(DcMotorEx.class, "frontRightMotor");
-        DcMotorEx backRightMotor = hardwareMap.get(DcMotorEx.class, "backRightMotor");
-        DcMotorEx bigHooperMotor = hardwareMap.get(DcMotorEx.class, "bigHooperMotor");
-        DcMotorEx smallHooperMotor = hardwareMap.get(DcMotorEx.class, "smallHooperMotor");
-
-        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        final DcMotorEx[] base = TeamConstants.getDriveMotors(hardwareMap);
+        final DcMotorEx[] scoring = TeamConstants.getScoringMotors(hardwareMap);
 
         waitForStart();
 
         if(isStopRequested()) return;
 
-        frontLeftMotor.setPower(0.5);
-        frontRightMotor.setPower(0.5);
-        backLeftMotor.setPower(0.5);
-        backRightMotor.setPower(0.5);
-        sleep(2200);
-        frontLeftMotor.setPower(0.25);
-        frontRightMotor.setPower(0.25);
-        backLeftMotor.setPower(-0.25);
-        backRightMotor.setPower(-0.25);
-        sleep(750);
-        frontLeftMotor.setPower(0);
-        frontRightMotor.setPower(0);
-        backLeftMotor.setPower(0);
-        backRightMotor.setPower(0);
-        bigHooperMotor.setPower(-0.625);
+        base[0].setPower(-0.5);
+        base[1].setPower(-0.5);
+        base[2].setPower(-0.5);
+        base[3].setPower(-0.5);
+        sleep(1000);
+        /*base[0].setPower(0.5);
+        base[1].setPower(0.5);
+        base[2].setPower(0.5);
+        base[3].setPower(0.5);
+        base[0].setPower(0.25);
+        base[1].setPower(0.25);
+        base[2].setPower(-0.25);
+        base[3].setPower(-0.25); */
+        //sleep(750);
+        base[0].setPower(0);
+        base[0].setPower(0);
+        base[0].setPower(0);
+        base[0].setPower(0);
+        scoring[0].setVelocity(4500);
         sleep(2000);
-        bigHooperMotor.setPower(0);
+        scoring[1].setPower(1);
+        scoring[2].setPower(1);
+        sleep(600);
+        scoring[1].setPower(0);
+        scoring[2].setPower(0);
+        sleep(500);
+        scoring[1].setPower(1);
+        scoring[2].setPower(1);
+        sleep(800);
+        scoring[0].setPower(0);
+        scoring[1].setPower(0);
+        scoring[2].setPower(0);
+
 
     }
 };
