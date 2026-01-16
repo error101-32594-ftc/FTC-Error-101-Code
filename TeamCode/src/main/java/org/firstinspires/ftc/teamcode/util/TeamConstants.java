@@ -10,26 +10,26 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import com.pedropathing.follower.Follower;
-import com.pedropathing.follower.FollowerConstants;
-import com.pedropathing.ftc.FollowerBuilder;
-import com.pedropathing.paths.PathConstraints;
-
 @Config
-public class Constants
+public class TeamConstants
 {
     // Counts-Per-Revolution of a REV HD Hex Motor.
     public static int CPR = 28;
     public static double LOCK_ON_DENOMINATOR = 27.25;
+    public static double LOCK_ON_OFFSET = 0.0;
+
+    public static double LL_MOUNT_ANGLE = 30;
+    public static double LL_LENS_HEIGHT_INCHES = 14.5;
+    public static double GOAL_HEIGHT_INCHES = 38.75;
 
     public static DcMotorEx[] getDriveMotors(HardwareMap hardwareMap)
     {
             // --- Get Motor Objects ---
             DcMotorEx[] motors = {
-                    hardwareMap.get(DcMotorEx.class, "frontLeftMotor"),
-                    hardwareMap.get(DcMotorEx.class, "backLeftMotor"),
-                    hardwareMap.get(DcMotorEx.class, "backRightMotor"),
-                    hardwareMap.get(DcMotorEx.class, "frontRightMotor")
+                    hardwareMap.get(DcMotorEx.class, "fl"),
+                    hardwareMap.get(DcMotorEx.class, "rl"),
+                    hardwareMap.get(DcMotorEx.class, "rr"),
+                    hardwareMap.get(DcMotorEx.class, "fr")
 
             };
 
@@ -59,20 +59,22 @@ public class Constants
     {
         // --- Get Motor Objects ---
         DcMotorEx[] motors = {
-                hardwareMap.get(DcMotorEx.class, "bigHooperMotor"),
-                hardwareMap.get(DcMotorEx.class, "smallHooperMotor")
+                hardwareMap.get(DcMotorEx.class, "hooper"),
+                hardwareMap.get(DcMotorEx.class, "intake1"),
+                hardwareMap.get(DcMotorEx.class, "intake2")
         };
 
         // --- Motor Placement ---
         // "F": Front; "B": Back
         // + --F-- +
         // | 1     |
-        // |  0    |
+        // | 20    |
         // + --B-- +
 
         // --- Set Motor Directions ---
         motors[0].setDirection(DcMotorSimple.Direction.REVERSE);
-        motors[1].setDirection(DcMotorSimple.Direction.FORWARD);
+        motors[1].setDirection(DcMotorSimple.Direction.REVERSE);
+        motors[2].setDirection(DcMotorSimple.Direction.REVERSE);
 
         return motors;
     }
@@ -102,16 +104,5 @@ public class Constants
         return limelight3a;
     }
 
-    // --- PedroPathing Constants ---
-    public static FollowerConstants followerConstants = new FollowerConstants();
 
-    public static PathConstraints pathConstraints = new PathConstraints(
-            0.99, 100, 1, 1
-    );
-
-    public static Follower createFollower(HardwareMap hardwareMap) {
-        return new FollowerBuilder(followerConstants, hardwareMap)
-                .pathConstraints(pathConstraints)
-                .build();
-    }
 }

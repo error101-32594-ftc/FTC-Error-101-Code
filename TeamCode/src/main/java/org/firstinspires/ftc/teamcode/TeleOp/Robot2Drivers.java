@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.util.DiagnosticLogger;
 import java.io.IOException;
 
 @TeleOp(group = "Robot Centric")
-public class TeleOpMecanumRobot2Drivers extends LinearOpMode {
+public class Robot2Drivers extends LinearOpMode {
     private IMU.Parameters parameters;
     @Override
     public void runOpMode() throws InterruptedException {
