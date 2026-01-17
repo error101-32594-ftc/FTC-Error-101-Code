@@ -34,7 +34,7 @@ public class AutoBasicbleu extends LinearOpMode {
         base[1].setPower(-0.25);
         base[2].setPower(0.25);
         base[3].setPower(0.25);
-        sleep(975);
+        sleep(993);
         base[0].setPower(0);
         base[1].setPower(0);
         base[2].setPower(0);
@@ -57,7 +57,7 @@ public class AutoBasicbleu extends LinearOpMode {
         base[1].setPower(0.25);
         base[2].setPower(0.25);
         base[3].setPower(0.25);
-        sleep(1000);
+        sleep(1250);
         base[0].setPower(0.25);
         base[1].setPower(0.25);
         base[2].setPower(-0.25);
