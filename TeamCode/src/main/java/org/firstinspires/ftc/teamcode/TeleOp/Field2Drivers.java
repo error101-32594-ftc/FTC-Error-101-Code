@@ -295,10 +295,10 @@ public class Field2Drivers extends LinearOpMode
 
             if (rightBumper2 && a2)
             {
-                scoring[1].setPower(-0.9);
+                scoring[1].setPower(-0.2);
             }  else if (a2)
             {
-                scoring[1].setPower(0.9);
+                scoring[1].setVelocity((1150/60)*28);
             } else
             {
                 scoring[1].setPower(0);
