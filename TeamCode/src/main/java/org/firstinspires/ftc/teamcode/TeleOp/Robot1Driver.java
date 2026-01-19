@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.util.DiagnosticLogger;
 import java.io.IOException;
 
 @TeleOp(group = "Robot Centric")
-public class TeleOpMecanumRobot2Drivers extends LinearOpMode {
+public class Robot1Driver extends LinearOpMode {
     private IMU.Parameters parameters;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -65,7 +65,7 @@ public class TeleOpMecanumRobot2Drivers extends LinearOpMode {
             double x = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x;
             double brakePower = 1 - gamepad1.right_trigger;
-            double bigHooperPower = gamepad2.left_trigger * 6000;
+            double bigHooperPower = gamepad1.left_trigger * 6000;
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
@@ -127,16 +127,16 @@ public class TeleOpMecanumRobot2Drivers extends LinearOpMode {
                 bigHooperMotor.setVelocity((bigHooperPower / 60)*CPR);
             }
 
-            if (gamepad2.a)
+            if (gamepad1.a)
             {
                 smallHooperMotor.setPower(0.9);
-            } else if (gamepad2.x) {
+            } else if (gamepad1.x) {
                 smallHooperMotor.setPower(-0.9);
             } else
             {
                 smallHooperMotor.setPower(0);
             }
-
+            
             frontLeftMotor.setPower(frontLeftPower * brakePower);
             backLeftMotor.setPower(backLeftPower * brakePower);
             frontRightMotor.setPower(frontRightPower * brakePower);

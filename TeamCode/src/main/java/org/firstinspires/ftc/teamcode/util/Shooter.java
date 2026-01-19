@@ -7,17 +7,17 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp(group = "Testing")
 public class Shooter extends LinearOpMode
 {
-    private final int CPR = Constants.CPR;
+    private final int CPR = TeamConstants.CPR;
+    private final double LL_MOUNT_ANGLE = TeamConstants.LL_MOUNT_ANGLE;
+    private final double LL_LENS_HEIGHT_INCHES = TeamConstants.LL_LENS_HEIGHT_INCHES;
+    private final double GOAL_HEIGHT_INCHES = TeamConstants.GOAL_HEIGHT_INCHES;
 
     private final static FtcDashboard DASH = FtcDashboard.getInstance();
 
@@ -26,9 +26,6 @@ public class Shooter extends LinearOpMode
     {
         // CONSTANTS:
         int INCREMENT = 25;
-        double LL_MOUNT_ANGLE = 30;
-        double LL_LENS_HEIGHT_INCHES = 14.5;
-        double GOAL_HEIGHT_INCHES = 38.75;
         //
 
         Telemetry telemetryM = new MultipleTelemetry(
@@ -36,9 +33,9 @@ public class Shooter extends LinearOpMode
         );
         telemetryM.setDisplayFormat(Telemetry.DisplayFormat.HTML);
 
-        DcMotorEx[] scoring = Constants.getScoringMotors(hardwareMap);
+        DcMotorEx[] scoring = TeamConstants.getScoringMotors(hardwareMap);
 
-        Limelight3A limelight = Constants.getLimelight(hardwareMap);
+        Limelight3A limelight = TeamConstants.getLimelight(hardwareMap);
 
         limelight.start();
 
@@ -81,13 +78,15 @@ public class Shooter extends LinearOpMode
             if(intake)
             {
                 scoring[1].setPower(0.9);
+                scoring[2].setPower(0.9);
             } else if(intakeReverse)
             {
                 scoring[1].setPower(-0.9);
+                scoring[2].setPower(-0.9);
             } else
             {
                 scoring[1].setPower(0);
-
+                scoring[2].setPower(0);
             }
 
             scoring[0].setVelocity((shootingInputRPM / 60) * CPR);

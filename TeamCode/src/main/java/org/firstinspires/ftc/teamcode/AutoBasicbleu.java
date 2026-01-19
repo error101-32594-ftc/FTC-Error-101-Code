@@ -1,4 +1,3 @@
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -10,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.util.TeamConstants;
 
 @Autonomous
-public class AutoBasic extends LinearOpMode {
+public class AutoBasicbleu extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // Declare motors
@@ -31,11 +30,11 @@ public class AutoBasic extends LinearOpMode {
         base[1].setPower(0.5);
         base[2].setPower(0.5);
         base[3].setPower(0.5); */
-        base[0].setPower(0.25);
-        base[1].setPower(0.25);
-        base[2].setPower(-0.25);
-        base[3].setPower(-0.25);
-        sleep(1000);
+        base[0].setPower(-0.25);
+        base[1].setPower(-0.25);
+        base[2].setPower(0.25);
+        base[3].setPower(0.25);
+        sleep(993);
         base[0].setPower(0);
         base[1].setPower(0);
         base[2].setPower(0);
@@ -50,25 +49,25 @@ public class AutoBasic extends LinearOpMode {
         sleep(5500);
         scoring[1].setPower(1);
         scoring[2].setPower(1);
-        sleep(800);
+        sleep(1500);
         scoring[0].setPower(0);
         scoring[1].setPower(0);
         scoring[2].setPower(0);
-        base[0].setPower(-0.25);
-        base[1].setPower(-0.25);
+        base[0].setPower(0.25);
+        base[1].setPower(0.25);
         base[2].setPower(0.25);
         base[3].setPower(0.25);
-        sleep(3400);
+        sleep(1250);
+        base[0].setPower(0.25);
+        base[1].setPower(0.25);
+        base[2].setPower(-0.25);
+        base[3].setPower(-0.25);
+        sleep(3150);
         base[0].setPower(-0.5);
         base[1].setPower(0.5);
         base[2].setPower(-0.5);
         base[3].setPower(0.5);
-        sleep(2300);
-        base[0].setPower(-0.25);
-        base[1].setPower(-0.25);
-        base[2].setPower(-0.25);
-        base[3].setPower(-0.25);
-        sleep(1750);
+        sleep(1250);
 
 
     }
