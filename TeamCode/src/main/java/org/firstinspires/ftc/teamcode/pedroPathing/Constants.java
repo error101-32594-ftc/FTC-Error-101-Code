@@ -16,9 +16,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Config
 public class Constants {
-    public static double multiplierForward = 0.008294676287147268;
-    public static double multiplierStrafe = 0.008038662919454933;
-    public static double multiplierTurn = 0.02731472448271;
+    public static double multiplierForward = 0.006140795931692835;
+    public static double multiplierStrafe = -0.0072753221875072275;
+    public static double multiplierTurn = 0.015429377289117809;
 
 
     public static FollowerConstants followerConstants = new FollowerConstants()
@@ -33,6 +33,8 @@ public class Constants {
             .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .xVelocity(50.15369745035338)
+       //     .yVelocity(56)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD);
     public static DriveEncoderConstants localizerConstants = new DriveEncoderConstants()
             .leftFrontMotorName("fl")
@@ -72,6 +74,8 @@ public class Constants {
                 .pathConstraints(pathConstraints)
                 .mecanumDrivetrain(driveConstants)
                 .driveEncoderLocalizer(localizerConstants)
+           //     .forwardZeroPowerAcceleration(deceleration)
+             //   .lateralZeroPowerAcceleration(deceleration)
                 .build();
     }
 }

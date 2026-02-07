@@ -15,7 +15,7 @@ public class TeamConstants
 {
     // Counts-Per-Revolution of a REV HD Hex Motor.
     public static int CPR = 28;
-    public static double LOCK_ON_DENOMINATOR = 27.25;
+    public static double LOCK_ON_DENOMINATOR = 35.25;
     public static double LOCK_ON_OFFSET = 0.0;
 
     public static double LL_MOUNT_ANGLE = 30;

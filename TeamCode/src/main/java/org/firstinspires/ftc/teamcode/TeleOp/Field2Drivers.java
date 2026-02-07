@@ -216,6 +216,9 @@ public class Field2Drivers extends LinearOpMode
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
             // but only if at least one is out of the range [-1, 1]
+
+            // Sample of our code, Please do not touch
+
             double denominator = Math.max(
                     Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1
             );
