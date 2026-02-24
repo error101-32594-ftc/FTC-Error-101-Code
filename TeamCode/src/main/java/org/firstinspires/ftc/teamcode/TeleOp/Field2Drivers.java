@@ -152,31 +152,45 @@ public class Field2Drivers extends LinearOpMode
                 tempDistance = rawDistance;
                 pastDistance = tempDistance;
 
-                if(tempDistance >= 81.5)
+                if(tempDistance >= 65.3)
                 {
-                    hooperPower = (6.25*tempDistance)-644;
-                } else if(tempDistance >= 76.2)
+                    hooperPower = (28.6*tempDistance)+1484;
+                } else if(tempDistance >= 62.5)
                 {
-                    hooperPower = (18.9*tempDistance)+2912;
-                } else if(tempDistance >= 65.7)
+                    hooperPower = (17.9*tempDistance)+2184;
+                } else if(tempDistance >= 46.2)
                 {
-                    hooperPower = (33.3*tempDistance)+1810;
-                } else if(tempDistance >= 59.1)
-                {
-                    hooperPower = (22.7*tempDistance)+2507;
-                } else if(tempDistance >= 54.6)
-                {
-                    hooperPower = (-22.2*tempDistance)+5163;
-                } else if(tempDistance >= 47.5)
-                {
-                    hooperPower = 3950;
-                } else if(tempDistance >= 40.4)
-                {
-                    hooperPower = (-14.1*tempDistance)+4619;
+                    hooperPower = (4.6*tempDistance)+3012;
                 } else
                 {
                     hooperPower = 3000;
                 }
+
+                //if(tempDistance >= 81.5)
+                //{
+                //    hooperPower = (6.25*tempDistance)-644;
+                //} else if(tempDistance >= 76.2)
+                //{
+                //    hooperPower = (18.9*tempDistance)+2912;
+                //} else if(tempDistance >= 65.7)
+                //{
+                //    hooperPower = (33.3*tempDistance)+1810;
+                //} else if(tempDistance >= 59.1)
+                //{
+                //    hooperPower = (22.7*tempDistance)+2507;
+                //} else if(tempDistance >= 54.6)
+                //{
+                //    hooperPower = (-22.2*tempDistance)+5163;
+                //} else if(tempDistance >= 47.5)
+                //{
+                //    hooperPower = 3950;
+                //} else if(tempDistance >= 40.4)
+                //{
+                //    hooperPower = (-14.1*tempDistance)+4619;
+                //} else
+                //{
+                //    hooperPower = 3000;
+                //}
                 meanDistance = 0;
             } else
             {
