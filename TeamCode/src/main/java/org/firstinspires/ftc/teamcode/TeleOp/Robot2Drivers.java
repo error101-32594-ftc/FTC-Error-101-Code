@@ -4,26 +4,26 @@ import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
 import androidx.annotation.NonNull;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 import org.firstinspires.ftc.teamcode.util.DiagnosticLogger;
 
 import java.io.IOException;
 
-@TeleOp(group = "Field Centric")
-public class TeleOpMecanumField1Driver extends LinearOpMode {
+@TeleOp(group = "Robot Centric")
+public class Robot2Drivers extends LinearOpMode {
     private IMU.Parameters parameters;
     @Override
     public void runOpMode() throws InterruptedException {
         // CPR of a Rev HD Hex Motor.
         final int CPR = 28;
-        // Declare motors
+        // Declare our motors
         // Make sure your ID's match your configuration
         DcMotorEx frontLeftMotor = hardwareMap.get(DcMotorEx.class, "frontLeftMotor");
         DcMotorEx backLeftMotor = hardwareMap.get(DcMotorEx.class, "backLeftMotor");
@@ -62,27 +62,19 @@ public class TeleOpMecanumField1Driver extends LinearOpMode {
 
         while (opModeIsActive()) {
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
-            double x = gamepad1.left_stick_x*1.1;
+            double x = gamepad1.left_stick_x * 1.1;
             double rx = gamepad1.right_stick_x;
-            double brakePower = 1-gamepad1.right_trigger;
-            double bigHooperPower = gamepad1.left_trigger * 6000;
-
-            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-            // Rotate the movement direction counter to the bot's rotation
-            double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-            double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
-
-            rotX = rotX * 1.1;
+            double brakePower = 1 - gamepad1.right_trigger;
+            double bigHooperPower = gamepad2.left_trigger * 6000;
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
             // but only if at least one is out of the range [-1, 1]
-            double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-            double frontLeftPower = (rotY + rotX + rx) / denominator;
-            double backLeftPower = (rotY - rotX + rx) / denominator;
-            double frontRightPower = (rotY - rotX - rx) / denominator;
-            double backRightPower = (rotY + rotX - rx) / denominator;
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+            double frontLeftPower = (y + x + rx) / denominator;
+            double backLeftPower = (y - x + rx) / denominator;
+            double frontRightPower = (y - x - rx) / denominator;
+            double backRightPower = (y + x - rx) / denominator;
 
             telemetry.addData("1, LT", gamepad1.left_trigger);
             telemetry.addData("1, RT", gamepad1.right_trigger);
@@ -127,12 +119,6 @@ public class TeleOpMecanumField1Driver extends LinearOpMode {
                 logger.stopRun();
             }
 
-            if (gamepad1.start)
-            {
-                imu.resetYaw();
-            }
-
-
             if(gamepad2.y)
             {
                 bigHooperMotor.setPower(-0.9);
@@ -141,20 +127,20 @@ public class TeleOpMecanumField1Driver extends LinearOpMode {
                 bigHooperMotor.setVelocity((bigHooperPower / 60)*CPR);
             }
 
-            if (gamepad1.a)
+            if (gamepad2.a)
             {
                 smallHooperMotor.setPower(0.9);
-            } else if (gamepad1.x) {
+            } else if (gamepad2.x) {
                 smallHooperMotor.setPower(-0.9);
             } else
             {
                 smallHooperMotor.setPower(0);
             }
 
-            frontLeftMotor.setPower(frontLeftPower*brakePower);
-            backLeftMotor.setPower(backLeftPower*brakePower);
-            frontRightMotor.setPower(frontRightPower*brakePower);
-            backRightMotor.setPower(backRightPower*brakePower);
+            frontLeftMotor.setPower(frontLeftPower * brakePower);
+            backLeftMotor.setPower(backLeftPower * brakePower);
+            frontRightMotor.setPower(frontRightPower * brakePower);
+            backRightMotor.setPower(backRightPower * brakePower);
         }
     }
 
@@ -167,11 +153,11 @@ public class TeleOpMecanumField1Driver extends LinearOpMode {
             logger = new DiagnosticLogger(
                     telemetry, hardwareMap,
                     new String[]
-                    {
-                        "frontLeftMotor", "backLeftMotor",
-                        "frontRightMotor", "backRightMotor",
-                        "bigHooperMotor", "smallHooperMotor"
-                    },
+                            {
+                                    "frontLeftMotor", "backLeftMotor",
+                                    "frontRightMotor", "backRightMotor",
+                                    "bigHooperMotor", "smallHooperMotor"
+                            },
                     null, null, "imu", parameters
             );
         } catch (IOException e)
@@ -180,5 +166,5 @@ public class TeleOpMecanumField1Driver extends LinearOpMode {
             throw new RuntimeException(e);
         }
         return logger;
-    }
+}
 }
